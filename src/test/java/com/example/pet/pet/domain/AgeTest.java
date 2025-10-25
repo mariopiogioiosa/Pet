@@ -28,4 +28,17 @@ class AgeTest {
         assertTrue(exception.getMessage().contains("Age must be greater than or equal to 0"));
     }
 
+    @Test
+    void fromNullable_shouldReturnNullWhenValueIsNull() {
+        Age age = Age.fromNullable(null);
+        assertNull(age);
+    }
+
+    @Test
+    void fromNullable_shouldCreateAgeWhenValueIsValid() {
+        Age age = Age.fromNullable(5);
+        assertNotNull(age);
+        assertEquals(5, age.value());
+    }
+
 }

@@ -44,4 +44,23 @@ class PersonNameTest {
         );
         assertTrue(exception.getMessage().contains("Person name cannot be null or blank"));
     }
+
+    @Test
+    void fromNullable_shouldReturnNullWhenValueIsNull() {
+        PersonName name = PersonName.fromNullable(null);
+        assertNull(name);
+    }
+
+    @Test
+    void fromNullable_shouldReturnNullWhenValueIsBlank() {
+        PersonName name = PersonName.fromNullable("   ");
+        assertNull(name);
+    }
+
+    @Test
+    void fromNullable_shouldCreatePersonNameWhenValueIsValid() {
+        PersonName name = PersonName.fromNullable("John Doe");
+        assertNotNull(name);
+        assertEquals("John Doe", name.value());
+    }
 }

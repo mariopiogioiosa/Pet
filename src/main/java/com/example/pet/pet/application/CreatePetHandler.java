@@ -18,10 +18,8 @@ public class CreatePetHandler {
         Pet pet = new Pet(
                 new PetName(request.name()),
                 new Species(request.species()),
-                request.age() != null ? new Age(request.age()) : null,
-                request.ownerName() != null && !request.ownerName().isBlank()
-                        ? new PersonName(request.ownerName())
-                        : null
+                Age.fromNullable(request.age()),
+                PersonName.fromNullable(request.ownerName())
         );
 
         Pet savedPet = repository.save(pet);
