@@ -56,6 +56,22 @@ public class InMemoryPetRepository implements PetRepository {
     }
 
     private Pet updatePet(Pet pet) {
+        // Find existing pet to validate version
+        Pet existingPet = pets.get(pet.getId());
+        if (existingPet == null) {
+            throw new IllegalArgumentException("Cannot update non-existent pet with ID: " + pet.getId());
+        }
+
+        // Validate optimistic lock - version must match
+        if (!existingPet.getVersion().equals(pet.getVersion())) {
+            throw new OptimisticLockException(
+                    pet.getId(),
+                    pet.getVersion(),
+                    existingPet.getVersion()
+            );
+        }
+
+        // Version matches - proceed with update
         Pet updatedPet = new Pet(
                 pet.getId(),
                 pet.getName(),

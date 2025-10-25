@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Contract test for PetRepository implementations.
@@ -167,6 +168,109 @@ public abstract class PetRepositoryContractTest {
 
         assertThat(firstDelete).isTrue();
         assertThat(secondDelete).isFalse();
+    }
+
+    @Test
+    void save_shouldThrowOptimisticLockExceptionWhenVersionMismatch() {
+        PetRepository repository = repoWithData();
+        Pet existingPet = repository.findById(1L).orElseThrow();
+
+        // Create update with stale version (version 0)
+        Pet staleUpdate = new Pet(
+                existingPet.getId(),
+                new PetName("Buddy Modified"),
+                existingPet.getSpecies(),
+                existingPet.getAge(),
+                existingPet.getOwnerName(),
+                0L  // Stale version
+        );
+
+        // First update - should succeed (version 0 matches)
+        Pet firstUpdate = repository.save(staleUpdate);
+        assertThat(firstUpdate.getVersion()).isEqualTo(1L);
+
+        // Second update with same stale version - should fail
+        assertThatThrownBy(() -> repository.save(staleUpdate))
+                .isInstanceOf(OptimisticLockException.class)
+                .hasMessageContaining("Optimistic lock failure")
+                .hasMessageContaining("ID 1")
+                .hasMessageContaining("expected version 0")
+                .hasMessageContaining("found version 1");
+    }
+
+    @Test
+    void save_shouldPreventConcurrentModifications() {
+        PetRepository repository = repoWithData();
+
+        // Simulate two users reading the same pet
+        Pet userAVersion = repository.findById(1L).orElseThrow();
+        Pet userBVersion = repository.findById(1L).orElseThrow();
+
+        // Both have version 0
+        assertThat(userAVersion.getVersion()).isEqualTo(0L);
+        assertThat(userBVersion.getVersion()).isEqualTo(0L);
+
+        // User A updates successfully
+        Pet userAUpdate = new Pet(
+                userAVersion.getId(),
+                new PetName("User A Update"),
+                userAVersion.getSpecies(),
+                userAVersion.getAge(),
+                userAVersion.getOwnerName(),
+                userAVersion.getVersion()
+        );
+        Pet savedByUserA = repository.save(userAUpdate);
+        assertThat(savedByUserA.getVersion()).isEqualTo(1L);
+
+        // User B tries to update with stale version - should fail
+        Pet userBUpdate = new Pet(
+                userBVersion.getId(),
+                new PetName("User B Update"),
+                userBVersion.getSpecies(),
+                userBVersion.getAge(),
+                userBVersion.getOwnerName(),
+                userBVersion.getVersion()  // Still version 0 (stale)
+        );
+
+        assertThatThrownBy(() -> repository.save(userBUpdate))
+                .isInstanceOf(OptimisticLockException.class)
+                .extracting("petId", "expectedVersion", "actualVersion")
+                .containsExactly(1L, 0L, 1L);
+    }
+
+    @Test
+    void save_shouldAllowUpdateWithCorrectVersion() {
+        PetRepository repository = repoWithData();
+
+        // First update
+        Pet pet = repository.findById(1L).orElseThrow();
+        Pet update1 = new Pet(
+                pet.getId(),
+                new PetName("Update 1"),
+                pet.getSpecies(),
+                pet.getAge(),
+                pet.getOwnerName(),
+                pet.getVersion()
+        );
+        Pet saved1 = repository.save(update1);
+        assertThat(saved1.getVersion()).isEqualTo(1L);
+
+        // Second update with correct version (1)
+        Pet update2 = new Pet(
+                saved1.getId(),
+                new PetName("Update 2"),
+                saved1.getSpecies(),
+                saved1.getAge(),
+                saved1.getOwnerName(),
+                saved1.getVersion()  // Correct version: 1
+        );
+        Pet saved2 = repository.save(update2);
+        assertThat(saved2.getVersion()).isEqualTo(2L);
+
+        // Verify final state
+        Pet finalPet = repository.findById(1L).orElseThrow();
+        assertThat(finalPet.getName()).isEqualTo(new PetName("Update 2"));
+        assertThat(finalPet.getVersion()).isEqualTo(2L);
     }
 
     /**
