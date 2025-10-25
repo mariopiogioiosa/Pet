@@ -1,5 +1,6 @@
 package com.example.pet.config;
 
+import com.example.pet.pet.application.CreatePetHandler;
 import com.example.pet.pet.application.GetPetByIdHandler;
 import com.example.pet.pet.domain.PetRepository;
 import com.example.pet.pet.infrastructure.persistence.InMemoryPetRepository;
@@ -17,5 +18,10 @@ public class ApplicationConfiguration {
     @Bean
     public GetPetByIdHandler getPetByIdHandler(PetRepository petRepository) {
         return new GetPetByIdHandler(petRepository);
+    }
+
+    @Bean
+    public CreatePetHandler createPetHandler(PetRepository petRepository) {
+        return new CreatePetHandler(petRepository);
     }
 }

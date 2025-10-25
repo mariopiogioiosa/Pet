@@ -19,26 +19,11 @@ public class InMemoryPetRepository implements PetRepository {
     private final AtomicLong idGenerator = new AtomicLong(0);
 
     public InMemoryPetRepository() {
-        seedData();
+        // No seed data - pets are created via the API
     }
-
 
     public InMemoryPetRepository(List<Pet> initialPets) {
         initialPets.forEach(pet -> pets.put(pet.getId(), pet));
-    }
-
-    private void seedData() {
-        // Seed with fake data (moved from GetPetByIdHandler)
-        Pet buddy = new Pet(
-                1L,
-                new PetName("Buddy"),
-                new Species("Dog"),
-                new Age(3),
-                new PersonName("John Doe"),
-                0L
-        );
-        pets.put(1L, buddy);
-        idGenerator.set(2L); // Next ID will be 2
     }
 
     @Override
