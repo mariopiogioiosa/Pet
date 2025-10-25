@@ -1,5 +1,6 @@
 package com.example.pet.controller;
 
+import com.example.pet.application.handlers.GetPetByIdQueryHandler;
 import com.example.pet.dto.PetDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,12 +12,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/v1/pets")
 @Tag(name = "Pet", description = "Pet management APIs")
 public class PetController {
+
+    private final GetPetByIdQueryHandler queryHandler;
+
+    public PetController(GetPetByIdQueryHandler queryHandler) {
+        this.queryHandler = queryHandler;
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a pet by ID", description = "Returns a pet based on the provided ID")
@@ -28,24 +33,9 @@ public class PetController {
     })
     public ResponseEntity<PetDTO> getPetById(@Parameter(name = "id", description = "Pet ID", required = true, example = "123")
                                                  @PathVariable Long id) {
-        return fake(id)
+        return queryHandler.handle(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(ResponseEntity.notFound()::build);
-
-    }
-
-    private Optional<PetDTO> fake(long id) {
-        if (id == 1L) {
-            return Optional.of(new PetDTO(
-                    1L,
-                    "Buddy",
-                    "Dog",
-                    3,
-                    "John Doe"
-            ));
-        }
-
-        return Optional.empty();
     }
 
 }
