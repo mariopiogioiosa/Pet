@@ -1,0 +1,52 @@
+package com.example.pet.controller;
+
+import com.example.pet.dto.PetDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/v1/pets")
+@Tag(name = "Pet", description = "Pet management APIs")
+public class PetController {
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a pet by ID", description = "Returns a pet based on the provided ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved pet",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PetDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Pet not found",
+                    content = @Content)
+    })
+    public ResponseEntity<PetDTO> getPetById(@Parameter(name = "id", description = "Pet ID", required = true, example = "123")
+                                                 @PathVariable Long id) {
+        return fake(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
+
+    }
+
+    private Optional<PetDTO> fake(long id) {
+        if (id == 1L) {
+            return Optional.of(new PetDTO(
+                    1L,
+                    "Buddy",
+                    "Dog",
+                    3,
+                    "John Doe"
+            ));
+        }
+
+        return Optional.empty();
+    }
+
+}
+
