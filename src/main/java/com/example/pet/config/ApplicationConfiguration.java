@@ -1,6 +1,8 @@
 package com.example.pet.config;
 
 import com.example.pet.pet.application.GetPetByIdHandler;
+import com.example.pet.pet.domain.PetRepository;
+import com.example.pet.pet.infrastructure.persistence.InMemoryPetRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,7 +10,12 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfiguration {
 
     @Bean
-    public GetPetByIdHandler getPetByIdHandler() {
-        return new GetPetByIdHandler();
+    public PetRepository petRepository() {
+        return new InMemoryPetRepository();
+    }
+
+    @Bean
+    public GetPetByIdHandler getPetByIdHandler(PetRepository petRepository) {
+        return new GetPetByIdHandler(petRepository);
     }
 }

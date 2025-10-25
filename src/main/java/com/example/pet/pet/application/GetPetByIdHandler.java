@@ -1,20 +1,30 @@
 package com.example.pet.pet.application;
 
+import com.example.pet.pet.domain.Pet;
+import com.example.pet.pet.domain.PetRepository;
+
 import java.util.Optional;
 
 public class GetPetByIdHandler {
 
-    public Optional<PetDTO> handle(Long id) {
-        if (id == 1L) {
-            return Optional.of(new PetDTO(
-                    1L,
-                    "Buddy",
-                    "Dog",
-                    3,
-                    "John Doe"
-            ));
-        }
+    private final PetRepository repository;
 
-        return Optional.empty();
+    public GetPetByIdHandler(PetRepository repository) {
+        this.repository = repository;
+    }
+
+    public Optional<PetDTO> handle(Long id) {
+        return repository.findById(id)
+                .map(this::toDTO);
+    }
+
+    private PetDTO toDTO(Pet pet) {
+        return new PetDTO(
+                pet.getId(),
+                pet.getName().value(),
+                pet.getSpecies().value(),
+                pet.getAge() != null ? pet.getAge().value() : null,
+                pet.getOwnerName() != null ? pet.getOwnerName().value() : null
+        );
     }
 }
