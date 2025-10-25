@@ -1,4 +1,4 @@
-package com.example.pet.dto;
+package com.example.pet.pet.application;
 
 public record PetDTO(
         Long id,

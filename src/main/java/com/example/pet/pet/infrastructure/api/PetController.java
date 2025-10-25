@@ -1,7 +1,7 @@
-package com.example.pet.controller;
+package com.example.pet.pet.infrastructure.api;
 
-import com.example.pet.application.handlers.GetPetByIdQueryHandler;
-import com.example.pet.dto.PetDTO;
+import com.example.pet.pet.application.GetPetByIdHandler;
+import com.example.pet.pet.application.PetDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Pet", description = "Pet management APIs")
 public class PetController {
 
-    private final GetPetByIdQueryHandler queryHandler;
+    private final GetPetByIdHandler queryHandler;
 
-    public PetController(GetPetByIdQueryHandler queryHandler) {
+    public PetController(GetPetByIdHandler queryHandler) {
         this.queryHandler = queryHandler;
     }
 
@@ -39,4 +39,3 @@ public class PetController {
     }
 
 }
-

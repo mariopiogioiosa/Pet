@@ -1,10 +1,8 @@
-package com.example.pet.application.handlers;
-
-import com.example.pet.dto.PetDTO;
+package com.example.pet.pet.application;
 
 import java.util.Optional;
 
-public class GetPetByIdQueryHandler {
+public class GetPetByIdHandler {
 
     public Optional<PetDTO> handle(Long id) {
         if (id == 1L) {

@@ -1,4 +1,4 @@
-package com.example.pet.controller;
+package com.example.pet.pet.acceptance;
 
 import com.example.pet.config.ApplicationConfiguration;
 import org.junit.jupiter.api.Test;
@@ -11,9 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(PetController.class)
+@WebMvcTest(controllers = com.example.pet.pet.infrastructure.api.PetController.class)
 @Import(ApplicationConfiguration.class)
-class PetControllerTest {
+class PetAcceptanceTest {
 
     @Autowired
     private MockMvc mockMvc;

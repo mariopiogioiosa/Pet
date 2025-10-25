@@ -1,6 +1,6 @@
 package com.example.pet.config;
 
-import com.example.pet.application.handlers.GetPetByIdQueryHandler;
+import com.example.pet.pet.application.GetPetByIdHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfiguration {
 
     @Bean
-    public GetPetByIdQueryHandler getPetByIdQueryHandler() {
-        return new GetPetByIdQueryHandler();
+    public GetPetByIdHandler getPetByIdHandler() {
+        return new GetPetByIdHandler();
     }
 }
