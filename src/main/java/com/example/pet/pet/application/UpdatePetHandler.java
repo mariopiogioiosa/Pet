@@ -3,10 +3,6 @@ package com.example.pet.pet.application;
 import com.example.pet.pet.domain.*;
 import java.util.Optional;
 
-/**
- * Command handler for updating an existing pet.
- * Fetches existing pet, creates updated instance, and persists it with optimistic locking.
- */
 public class UpdatePetHandler {
 
     private final PetRepository repository;

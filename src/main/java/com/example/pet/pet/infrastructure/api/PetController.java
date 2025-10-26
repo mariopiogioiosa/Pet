@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -62,7 +63,10 @@ public class PetController {
                 @ApiResponse(
                         responseCode = "400",
                         description = "Invalid input data",
-                        content = @Content)
+                        content =
+                                @Content(
+                                        mediaType = "application/problem+json",
+                                        schema = @Schema(implementation = ProblemDetail.class)))
             })
     public ResponseEntity<PetDTO> createPet(@Valid @RequestBody CreatePetRequest request) {
         PetDTO createdPet = createHandler.handle(request);
@@ -140,7 +144,10 @@ public class PetController {
                 @ApiResponse(
                         responseCode = "400",
                         description = "Invalid input data",
-                        content = @Content)
+                        content =
+                                @Content(
+                                        mediaType = "application/problem+json",
+                                        schema = @Schema(implementation = ProblemDetail.class)))
             })
     public ResponseEntity<PetDTO> updatePet(
             @Parameter(name = "id", description = "Pet ID", required = true, example = "123")

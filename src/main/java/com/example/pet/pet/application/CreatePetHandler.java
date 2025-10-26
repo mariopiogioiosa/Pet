@@ -2,10 +2,6 @@ package com.example.pet.pet.application;
 
 import com.example.pet.pet.domain.*;
 
-/**
- * Command handler for creating a new pet.
- * Converts request DTO to domain model, persists it, and returns DTO.
- */
 public class CreatePetHandler {
 
     private final PetRepository repository;
