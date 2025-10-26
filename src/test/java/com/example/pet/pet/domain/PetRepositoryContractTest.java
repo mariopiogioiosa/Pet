@@ -1,12 +1,11 @@
 package com.example.pet.pet.domain;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 /**
  * Contract test for PetRepository implementations.
@@ -14,23 +13,23 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 public abstract class PetRepositoryContractTest {
 
-    protected static final Pet BUDDY = new Pet(
-            1L,
-            new PetName("Buddy"),
-            new Species("Dog"),
-            new Age(3),
-            new PersonName("John Doe"),
-            0L
-    );
+    protected static final Pet BUDDY =
+            new Pet(
+                    1L,
+                    new PetName("Buddy"),
+                    new Species("Dog"),
+                    new Age(3),
+                    new PersonName("John Doe"),
+                    0L);
 
-    protected static final Pet MAX = new Pet(
-            2L,
-            new PetName("Max"),
-            new Species("Cat"),
-            new Age(5),
-            new PersonName("Jane Smith"),
-            0L
-    );
+    protected static final Pet MAX =
+            new Pet(
+                    2L,
+                    new PetName("Max"),
+                    new Species("Cat"),
+                    new Age(5),
+                    new PersonName("Jane Smith"),
+                    0L);
 
     @Test
     void findById_shouldReturnEmptyWhenPetNotFound() {
@@ -75,12 +74,12 @@ public abstract class PetRepositoryContractTest {
     @Test
     void save_shouldCreateNewPetWithIdAssigned() {
         PetRepository repository = repoWithNoData();
-        Pet newPet = new Pet(
-                new PetName("Charlie"),
-                new Species("Rabbit"),
-                new Age(2),
-                new PersonName("Alice")
-        );
+        Pet newPet =
+                new Pet(
+                        new PetName("Charlie"),
+                        new Species("Rabbit"),
+                        new Age(2),
+                        new PersonName("Alice"));
 
         Pet saved = repository.save(newPet);
 
@@ -100,14 +99,14 @@ public abstract class PetRepositoryContractTest {
         Pet existingPet = repository.findById(1L).orElseThrow();
 
         // Create updated version of the pet
-        Pet updatedPet = new Pet(
-                existingPet.getId(),
-                new PetName("Buddy Updated"),
-                existingPet.getSpecies(),
-                existingPet.getAge(),
-                existingPet.getOwnerName(),
-                existingPet.getVersion()
-        );
+        Pet updatedPet =
+                new Pet(
+                        existingPet.getId(),
+                        new PetName("Buddy Updated"),
+                        existingPet.getSpecies(),
+                        existingPet.getAge(),
+                        existingPet.getOwnerName(),
+                        existingPet.getVersion());
 
         Pet saved = repository.save(updatedPet);
 
@@ -122,14 +121,14 @@ public abstract class PetRepositoryContractTest {
         Long initialVersion = existingPet.getVersion();
 
         // Create updated version
-        Pet updatedPet = new Pet(
-                existingPet.getId(),
-                new PetName("Buddy v2"),
-                existingPet.getSpecies(),
-                existingPet.getAge(),
-                existingPet.getOwnerName(),
-                initialVersion
-        );
+        Pet updatedPet =
+                new Pet(
+                        existingPet.getId(),
+                        new PetName("Buddy v2"),
+                        existingPet.getSpecies(),
+                        existingPet.getAge(),
+                        existingPet.getOwnerName(),
+                        initialVersion);
 
         Pet saved = repository.save(updatedPet);
 
@@ -176,14 +175,15 @@ public abstract class PetRepositoryContractTest {
         Pet existingPet = repository.findById(1L).orElseThrow();
 
         // Create update with stale version (version 0)
-        Pet staleUpdate = new Pet(
-                existingPet.getId(),
-                new PetName("Buddy Modified"),
-                existingPet.getSpecies(),
-                existingPet.getAge(),
-                existingPet.getOwnerName(),
-                0L  // Stale version
-        );
+        Pet staleUpdate =
+                new Pet(
+                        existingPet.getId(),
+                        new PetName("Buddy Modified"),
+                        existingPet.getSpecies(),
+                        existingPet.getAge(),
+                        existingPet.getOwnerName(),
+                        0L // Stale version
+                        );
 
         // First update - should succeed (version 0 matches)
         Pet firstUpdate = repository.save(staleUpdate);
@@ -211,26 +211,27 @@ public abstract class PetRepositoryContractTest {
         assertThat(userBVersion.getVersion()).isEqualTo(0L);
 
         // User A updates successfully
-        Pet userAUpdate = new Pet(
-                userAVersion.getId(),
-                new PetName("User A Update"),
-                userAVersion.getSpecies(),
-                userAVersion.getAge(),
-                userAVersion.getOwnerName(),
-                userAVersion.getVersion()
-        );
+        Pet userAUpdate =
+                new Pet(
+                        userAVersion.getId(),
+                        new PetName("User A Update"),
+                        userAVersion.getSpecies(),
+                        userAVersion.getAge(),
+                        userAVersion.getOwnerName(),
+                        userAVersion.getVersion());
         Pet savedByUserA = repository.save(userAUpdate);
         assertThat(savedByUserA.getVersion()).isEqualTo(1L);
 
         // User B tries to update with stale version - should fail
-        Pet userBUpdate = new Pet(
-                userBVersion.getId(),
-                new PetName("User B Update"),
-                userBVersion.getSpecies(),
-                userBVersion.getAge(),
-                userBVersion.getOwnerName(),
-                userBVersion.getVersion()  // Still version 0 (stale)
-        );
+        Pet userBUpdate =
+                new Pet(
+                        userBVersion.getId(),
+                        new PetName("User B Update"),
+                        userBVersion.getSpecies(),
+                        userBVersion.getAge(),
+                        userBVersion.getOwnerName(),
+                        userBVersion.getVersion() // Still version 0 (stale)
+                        );
 
         assertThatThrownBy(() -> repository.save(userBUpdate))
                 .isInstanceOf(OptimisticLockException.class)
@@ -244,26 +245,27 @@ public abstract class PetRepositoryContractTest {
 
         // First update
         Pet pet = repository.findById(1L).orElseThrow();
-        Pet update1 = new Pet(
-                pet.getId(),
-                new PetName("Update 1"),
-                pet.getSpecies(),
-                pet.getAge(),
-                pet.getOwnerName(),
-                pet.getVersion()
-        );
+        Pet update1 =
+                new Pet(
+                        pet.getId(),
+                        new PetName("Update 1"),
+                        pet.getSpecies(),
+                        pet.getAge(),
+                        pet.getOwnerName(),
+                        pet.getVersion());
         Pet saved1 = repository.save(update1);
         assertThat(saved1.getVersion()).isEqualTo(1L);
 
         // Second update with correct version (1)
-        Pet update2 = new Pet(
-                saved1.getId(),
-                new PetName("Update 2"),
-                saved1.getSpecies(),
-                saved1.getAge(),
-                saved1.getOwnerName(),
-                saved1.getVersion()  // Correct version: 1
-        );
+        Pet update2 =
+                new Pet(
+                        saved1.getId(),
+                        new PetName("Update 2"),
+                        saved1.getSpecies(),
+                        saved1.getAge(),
+                        saved1.getOwnerName(),
+                        saved1.getVersion() // Correct version: 1
+                        );
         Pet saved2 = repository.save(update2);
         assertThat(saved2.getVersion()).isEqualTo(2L);
 

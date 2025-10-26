@@ -19,15 +19,16 @@ public class Pet {
         this.id = null;
         this.name = Objects.requireNonNull(name, "Name is required");
         this.species = Objects.requireNonNull(species, "Species is required");
-        this.age = age;  // Optional
-        this.ownerName = ownerName;  // Optional
+        this.age = age; // Optional
+        this.ownerName = ownerName; // Optional
         this.version = 0L;
     }
 
     /**
      * Constructor for loading a pet from persistence.
      */
-    public Pet(Long id, PetName name, Species species, Age age, PersonName ownerName, Long version) {
+    public Pet(
+            Long id, PetName name, Species species, Age age, PersonName ownerName, Long version) {
         this.id = id;
         this.name = Objects.requireNonNull(name, "Name is required");
         this.species = Objects.requireNonNull(species, "Species is required");
@@ -81,13 +82,19 @@ public class Pet {
 
     @Override
     public String toString() {
-        return "Pet{" +
-                "id=" + id +
-                ", name=" + name +
-                ", species=" + species +
-                ", age=" + age +
-                ", ownerName=" + ownerName +
-                ", version=" + version +
-                '}';
+        return "Pet{"
+                + "id="
+                + id
+                + ", name="
+                + name
+                + ", species="
+                + species
+                + ", age="
+                + age
+                + ", ownerName="
+                + ownerName
+                + ", version="
+                + version
+                + '}';
     }
 }

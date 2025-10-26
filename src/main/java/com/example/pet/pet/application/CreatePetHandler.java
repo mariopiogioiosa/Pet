@@ -15,12 +15,12 @@ public class CreatePetHandler {
     }
 
     public PetDTO handle(CreatePetRequest request) {
-        Pet pet = new Pet(
-                new PetName(request.name()),
-                new Species(request.species()),
-                Age.fromNullable(request.age()),
-                PersonName.fromNullable(request.ownerName())
-        );
+        Pet pet =
+                new Pet(
+                        new PetName(request.name()),
+                        new Species(request.species()),
+                        Age.fromNullable(request.age()),
+                        PersonName.fromNullable(request.ownerName()));
 
         Pet savedPet = repository.save(pet);
 

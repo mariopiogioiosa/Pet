@@ -1,8 +1,8 @@
 package com.example.pet.pet.domain;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class PetTest {
 
@@ -61,10 +61,8 @@ class PetTest {
     void shouldThrowExceptionWhenNameIsNull() {
         Species species = new Species("Dog");
 
-        NullPointerException exception = assertThrows(
-                NullPointerException.class,
-                () -> new Pet(null, species, null, null)
-        );
+        NullPointerException exception =
+                assertThrows(NullPointerException.class, () -> new Pet(null, species, null, null));
         assertTrue(exception.getMessage().contains("Name is required"));
     }
 
@@ -72,21 +70,19 @@ class PetTest {
     void shouldThrowExceptionWhenSpeciesIsNull() {
         PetName name = new PetName("Buddy");
 
-        NullPointerException exception = assertThrows(
-                NullPointerException.class,
-                () -> new Pet(name, null, null, null)
-        );
+        NullPointerException exception =
+                assertThrows(NullPointerException.class, () -> new Pet(name, null, null, null));
         assertTrue(exception.getMessage().contains("Species is required"));
     }
 
     @Test
     void shouldAssignIdWhenPetHasNoId() {
-        Pet pet = new Pet(
-                new PetName("Buddy"),
-                new Species("Dog"),
-                new Age(3),
-                new PersonName("John")
-        );
+        Pet pet =
+                new Pet(
+                        new PetName("Buddy"),
+                        new Species("Dog"),
+                        new Age(3),
+                        new PersonName("John"));
 
         assertNull(pet.getId());
 
@@ -97,47 +93,28 @@ class PetTest {
 
     @Test
     void shouldThrowExceptionWhenReassigningId() {
-        Pet pet = new Pet(
-                new PetName("Buddy"),
-                new Species("Dog"),
-                null,
-                null
-        );
+        Pet pet = new Pet(new PetName("Buddy"), new Species("Dog"), null, null);
 
         pet.assignId(100L);
 
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> pet.assignId(200L)
-        );
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> pet.assignId(200L));
         assertTrue(exception.getMessage().contains("Cannot reassign ID"));
         assertTrue(exception.getMessage().contains("100"));
     }
 
     @Test
     void shouldThrowExceptionWhenAssigningNullId() {
-        Pet pet = new Pet(
-                new PetName("Buddy"),
-                new Species("Dog"),
-                null,
-                null
-        );
+        Pet pet = new Pet(new PetName("Buddy"), new Species("Dog"), null, null);
 
-        NullPointerException exception = assertThrows(
-                NullPointerException.class,
-                () -> pet.assignId(null)
-        );
+        NullPointerException exception =
+                assertThrows(NullPointerException.class, () -> pet.assignId(null));
         assertTrue(exception.getMessage().contains("ID cannot be null"));
     }
 
     @Test
     void shouldIncrementVersion() {
-        Pet pet = new Pet(
-                new PetName("Buddy"),
-                new Species("Dog"),
-                null,
-                null
-        );
+        Pet pet = new Pet(new PetName("Buddy"), new Species("Dog"), null, null);
 
         assertEquals(0L, pet.getVersion());
 
@@ -150,14 +127,14 @@ class PetTest {
 
     @Test
     void shouldHaveReadableToString() {
-        Pet pet = new Pet(
-                1L,
-                new PetName("Buddy"),
-                new Species("Dog"),
-                new Age(3),
-                new PersonName("John"),
-                0L
-        );
+        Pet pet =
+                new Pet(
+                        1L,
+                        new PetName("Buddy"),
+                        new Species("Dog"),
+                        new Age(3),
+                        new PersonName("John"),
+                        0L);
 
         String toString = pet.toString();
 

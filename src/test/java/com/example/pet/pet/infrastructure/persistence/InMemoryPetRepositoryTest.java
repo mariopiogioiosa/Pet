@@ -2,7 +2,6 @@ package com.example.pet.pet.infrastructure.persistence;
 
 import com.example.pet.pet.domain.PetRepository;
 import com.example.pet.pet.domain.PetRepositoryContractTest;
-
 import java.util.List;
 
 /**

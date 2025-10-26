@@ -1,7 +1,6 @@
 package com.example.pet.pet.infrastructure.persistence;
 
 import com.example.pet.pet.domain.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,41 +43,39 @@ public class InMemoryPetRepository implements PetRepository {
         // Find existing pet to validate version
         Pet existingPet = pets.get(pet.getId());
         if (existingPet == null) {
-            throw new IllegalArgumentException("Cannot update non-existent pet with ID: " + pet.getId());
+            throw new IllegalArgumentException(
+                    "Cannot update non-existent pet with ID: " + pet.getId());
         }
 
         // Validate optimistic lock - version must match
         if (!existingPet.getVersion().equals(pet.getVersion())) {
             throw new OptimisticLockException(
-                    pet.getId(),
-                    pet.getVersion(),
-                    existingPet.getVersion()
-            );
+                    pet.getId(), pet.getVersion(), existingPet.getVersion());
         }
 
         // Version matches - proceed with update
-        Pet updatedPet = new Pet(
-                pet.getId(),
-                pet.getName(),
-                pet.getSpecies(),
-                pet.getAge(),
-                pet.getOwnerName(),
-                pet.getVersion() + 1
-        );
+        Pet updatedPet =
+                new Pet(
+                        pet.getId(),
+                        pet.getName(),
+                        pet.getSpecies(),
+                        pet.getAge(),
+                        pet.getOwnerName(),
+                        pet.getVersion() + 1);
         pets.put(pet.getId(), updatedPet);
         return updatedPet;
     }
 
     private Pet createPet(Pet pet) {
         Long newId = idGenerator.getAndIncrement();
-        Pet persistedPet = new Pet(
-                newId,
-                pet.getName(),
-                pet.getSpecies(),
-                pet.getAge(),
-                pet.getOwnerName(),
-                0L
-        );
+        Pet persistedPet =
+                new Pet(
+                        newId,
+                        pet.getName(),
+                        pet.getSpecies(),
+                        pet.getAge(),
+                        pet.getOwnerName(),
+                        0L);
         pets.put(newId, persistedPet);
         return persistedPet;
     }

@@ -1,8 +1,8 @@
 package com.example.pet.pet.domain;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class PersonNameTest {
 
@@ -20,28 +20,22 @@ class PersonNameTest {
 
     @Test
     void shouldThrowExceptionWhenNameIsNull() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> new PersonName(null)
-        );
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> new PersonName(null));
         assertTrue(exception.getMessage().contains("Person name cannot be null or blank"));
     }
 
     @Test
     void shouldThrowExceptionWhenNameIsEmpty() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> new PersonName("")
-        );
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> new PersonName(""));
         assertTrue(exception.getMessage().contains("Person name cannot be null or blank"));
     }
 
     @Test
     void shouldThrowExceptionWhenNameIsBlank() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> new PersonName("   ")
-        );
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> new PersonName("   "));
         assertTrue(exception.getMessage().contains("Person name cannot be null or blank"));
     }
 

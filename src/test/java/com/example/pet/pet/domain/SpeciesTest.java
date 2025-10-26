@@ -1,8 +1,8 @@
 package com.example.pet.pet.domain;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class SpeciesTest {
 
@@ -21,28 +21,22 @@ class SpeciesTest {
 
     @Test
     void shouldThrowExceptionWhenSpeciesIsNull() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> new Species(null)
-        );
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> new Species(null));
         assertTrue(exception.getMessage().contains("Species cannot be null or blank"));
     }
 
     @Test
     void shouldThrowExceptionWhenSpeciesIsEmpty() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> new Species("")
-        );
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> new Species(""));
         assertTrue(exception.getMessage().contains("Species cannot be null or blank"));
     }
 
     @Test
     void shouldThrowExceptionWhenSpeciesIsBlank() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> new Species("   ")
-        );
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> new Species("   "));
         assertTrue(exception.getMessage().contains("Species cannot be null or blank"));
     }
 

@@ -1,5 +1,10 @@
 package com.example.pet.pet.acceptance;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.example.pet.config.ApplicationConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -10,25 +15,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @WebMvcTest(controllers = com.example.pet.pet.infrastructure.api.PetController.class)
 @Import(ApplicationConfiguration.class)
 class PetAcceptanceTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     @Test
     void shouldCreateAndRetrievePet() throws Exception {
         // Create a pet
-        String createRequest = """
+        String createRequest =
+                """
                 {
                     "name": "Buddy",
                     "species": "Dog",
@@ -37,25 +36,26 @@ class PetAcceptanceTest {
                 }
                 """;
 
-        MvcResult createResult = mockMvc.perform(post("/api/v1/pets")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createRequest))
-                .andExpect(status().isCreated())
-                .andExpect(header().exists("Location"))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Buddy"))
-                .andExpect(jsonPath("$.species").value("Dog"))
-                .andExpect(jsonPath("$.age").value(3))
-                .andExpect(jsonPath("$.ownerName").value("John Doe"))
-                .andReturn();
+        MvcResult createResult =
+                mockMvc.perform(
+                                post("/api/v1/pets")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(createRequest))
+                        .andExpect(status().isCreated())
+                        .andExpect(header().exists("Location"))
+                        .andExpect(jsonPath("$.id").exists())
+                        .andExpect(jsonPath("$.name").value("Buddy"))
+                        .andExpect(jsonPath("$.species").value("Dog"))
+                        .andExpect(jsonPath("$.age").value(3))
+                        .andExpect(jsonPath("$.ownerName").value("John Doe"))
+                        .andReturn();
 
         // Extract the created pet's ID from the response
         String responseBody = createResult.getResponse().getContentAsString();
         Long createdPetId = objectMapper.readTree(responseBody).get("id").asLong();
 
         // Retrieve the pet by ID
-        mockMvc.perform(get("/api/v1/pets/" + createdPetId)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/pets/" + createdPetId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(createdPetId))
@@ -67,15 +67,15 @@ class PetAcceptanceTest {
 
     @Test
     void shouldReturnNotFoundWhenPetDoesNotExist() throws Exception {
-        mockMvc.perform(get("/api/v1/pets/999")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/pets/999").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldUpdatePetSuccessfully() throws Exception {
         // Create a pet first
-        String createRequest = """
+        String createRequest =
+                """
                 {
                     "name": "Max",
                     "species": "Cat",
@@ -84,17 +84,20 @@ class PetAcceptanceTest {
                 }
                 """;
 
-        MvcResult createResult = mockMvc.perform(post("/api/v1/pets")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createRequest))
-                .andExpect(status().isCreated())
-                .andReturn();
+        MvcResult createResult =
+                mockMvc.perform(
+                                post("/api/v1/pets")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(createRequest))
+                        .andExpect(status().isCreated())
+                        .andReturn();
 
         String responseBody = createResult.getResponse().getContentAsString();
         Long createdPetId = objectMapper.readTree(responseBody).get("id").asLong();
 
         // Update the pet
-        String updateRequest = """
+        String updateRequest =
+                """
                 {
                     "name": "Maximus",
                     "species": "Cat",
@@ -103,9 +106,10 @@ class PetAcceptanceTest {
                 }
                 """;
 
-        mockMvc.perform(put("/api/v1/pets/" + createdPetId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateRequest))
+        mockMvc.perform(
+                        put("/api/v1/pets/" + createdPetId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(updateRequest))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(createdPetId))
@@ -115,8 +119,7 @@ class PetAcceptanceTest {
                 .andExpect(jsonPath("$.ownerName").value("Jane Doe"));
 
         // Verify the update persisted by fetching the pet
-        mockMvc.perform(get("/api/v1/pets/" + createdPetId)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/pets/" + createdPetId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Maximus"))
                 .andExpect(jsonPath("$.age").value(3))
@@ -125,7 +128,8 @@ class PetAcceptanceTest {
 
     @Test
     void shouldReturnNotFoundWhenUpdatingNonExistentPet() throws Exception {
-        String updateRequest = """
+        String updateRequest =
+                """
                 {
                     "name": "Ghost",
                     "species": "Dog",
@@ -134,10 +138,10 @@ class PetAcceptanceTest {
                 }
                 """;
 
-        mockMvc.perform(put("/api/v1/pets/999")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateRequest))
+        mockMvc.perform(
+                        put("/api/v1/pets/999")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(updateRequest))
                 .andExpect(status().isNotFound());
     }
-
 }
