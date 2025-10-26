@@ -1,7 +1,6 @@
 package com.example.pet.infrastructure.web;
 
 import java.util.stream.Stream;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -45,10 +44,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         HttpStatus.BAD_REQUEST, "Validation failed for one or more fields");
 
         problemDetail.setTitle("Bad Request");
-        problemDetail.setProperty("errors", ex.getBindingResult().getFieldErrors()
-                .stream()
-                .map(ValidationError::fromFieldError)
-                .toList());
+        problemDetail.setProperty(
+                "errors",
+                ex.getBindingResult().getFieldErrors().stream()
+                        .map(ValidationError::fromFieldError)
+                        .toList());
 
         return ResponseEntity.badRequest().body(problemDetail);
     }
@@ -76,22 +76,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         problemDetail.setTitle("Bad Request");
 
-        problemDetail.setProperty("errors", ex.getParameterValidationResults()
-                .stream()
-                .flatMap(GlobalExceptionHandler::getValidationErrorStream)
-                .toList());
+        problemDetail.setProperty(
+                "errors",
+                ex.getParameterValidationResults().stream()
+                        .flatMap(GlobalExceptionHandler::getValidationErrorStream)
+                        .toList());
 
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
-    private static Stream<ValidationError> getValidationErrorStream(ParameterValidationResult result) {
+    private static Stream<ValidationError> getValidationErrorStream(
+            ParameterValidationResult result) {
         String parameterName = result.getMethodParameter().getParameterName();
         String field = parameterName != null ? parameterName : "unknown";
 
         return result.getResolvableErrors().stream()
-                .map(error -> new ValidationError(field,
-                        result.getArgument(),
-                        error.getDefaultMessage()));
+                .map(
+                        error ->
+                                new ValidationError(
+                                        field, result.getArgument(), error.getDefaultMessage()));
     }
 
     /**

@@ -175,8 +175,7 @@ class PetAcceptanceTest {
         Long createdPetId = objectMapper.readTree(responseBody).get("id").asLong();
 
         // Delete the pet
-        mockMvc.perform(delete("/api/v1/pets/" + createdPetId))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v1/pets/" + createdPetId)).andExpect(status().isNoContent());
 
         // Verify the pet no longer exists
         mockMvc.perform(get("/api/v1/pets/" + createdPetId).contentType(MediaType.APPLICATION_JSON))

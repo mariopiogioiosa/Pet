@@ -78,9 +78,7 @@ public class PetController {
     }
 
     @GetMapping
-    @Operation(
-            summary = "Get all pets",
-            description = "Returns a list of all pets in the system")
+    @Operation(summary = "Get all pets", description = "Returns a list of all pets in the system")
     @ApiResponses(
             value = {
                 @ApiResponse(
