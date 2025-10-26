@@ -2,6 +2,7 @@ package com.example.pet.pet.infrastructure.api;
 
 import com.example.pet.pet.application.CreatePetHandler;
 import com.example.pet.pet.application.CreatePetRequest;
+import com.example.pet.pet.application.DeletePetHandler;
 import com.example.pet.pet.application.GetPetByIdHandler;
 import com.example.pet.pet.application.PetDTO;
 import com.example.pet.pet.application.UpdatePetHandler;
@@ -27,14 +28,17 @@ public class PetController {
     private final GetPetByIdHandler queryHandler;
     private final CreatePetHandler createHandler;
     private final UpdatePetHandler updateHandler;
+    private final DeletePetHandler deleteHandler;
 
     public PetController(
             GetPetByIdHandler queryHandler,
             CreatePetHandler createHandler,
-            UpdatePetHandler updateHandler) {
+            UpdatePetHandler updateHandler,
+            DeletePetHandler deleteHandler) {
         this.queryHandler = queryHandler;
         this.createHandler = createHandler;
         this.updateHandler = updateHandler;
+        this.deleteHandler = deleteHandler;
     }
 
     @PostMapping
@@ -125,5 +129,25 @@ public class PetController {
                 .handle(id, request)
                 .map(ResponseEntity::ok)
                 .orElseGet(ResponseEntity.notFound()::build);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Delete a pet",
+            description = "Deletes a pet by ID. Returns 204 if successful, 404 if not found")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "204", description = "Pet deleted successfully"),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Pet not found",
+                        content = @Content)
+            })
+    public ResponseEntity<Void> deletePet(
+            @Parameter(name = "id", description = "Pet ID", required = true, example = "123")
+                    @PathVariable
+                    Long id) {
+        boolean deleted = deleteHandler.handle(id);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.pet.pet.acceptance;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -143,5 +144,43 @@ class PetAcceptanceTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(updateRequest))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldDeletePetSuccessfully() throws Exception {
+        // Create a pet first
+        String createRequest =
+                """
+                {
+                    "name": "Charlie",
+                    "species": "Dog",
+                    "age": 4,
+                    "ownerName": "Bob Smith"
+                }
+                """;
+
+        MvcResult createResult =
+                mockMvc.perform(
+                                post("/api/v1/pets")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(createRequest))
+                        .andExpect(status().isCreated())
+                        .andReturn();
+
+        String responseBody = createResult.getResponse().getContentAsString();
+        Long createdPetId = objectMapper.readTree(responseBody).get("id").asLong();
+
+        // Delete the pet
+        mockMvc.perform(delete("/api/v1/pets/" + createdPetId))
+                .andExpect(status().isNoContent());
+
+        // Verify the pet no longer exists
+        mockMvc.perform(get("/api/v1/pets/" + createdPetId).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenDeletingNonExistentPet() throws Exception {
+        mockMvc.perform(delete("/api/v1/pets/999")).andExpect(status().isNotFound());
     }
 }
