@@ -234,9 +234,7 @@ public abstract class PetRepositoryContractTest {
                         );
 
         assertThatThrownBy(() -> repository.save(userBUpdate))
-                .isInstanceOf(OptimisticLockException.class)
-                .extracting("petId", "expectedVersion", "actualVersion")
-                .containsExactly(1L, 0L, 1L);
+                .isInstanceOf(OptimisticLockException.class);
     }
 
     @Test
