@@ -3,6 +3,7 @@ package com.example.pet.pet.infrastructure.api;
 import com.example.pet.pet.application.CreatePetHandler;
 import com.example.pet.pet.application.CreatePetRequest;
 import com.example.pet.pet.application.DeletePetHandler;
+import com.example.pet.pet.application.GetAllPetsHandler;
 import com.example.pet.pet.application.GetPetByIdHandler;
 import com.example.pet.pet.application.PetDTO;
 import com.example.pet.pet.application.UpdatePetHandler;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,16 +28,19 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class PetController {
 
     private final GetPetByIdHandler queryHandler;
+    private final GetAllPetsHandler getAllPetsHandler;
     private final CreatePetHandler createHandler;
     private final UpdatePetHandler updateHandler;
     private final DeletePetHandler deleteHandler;
 
     public PetController(
             GetPetByIdHandler queryHandler,
+            GetAllPetsHandler getAllPetsHandler,
             CreatePetHandler createHandler,
             UpdatePetHandler updateHandler,
             DeletePetHandler deleteHandler) {
         this.queryHandler = queryHandler;
+        this.getAllPetsHandler = getAllPetsHandler;
         this.createHandler = createHandler;
         this.updateHandler = updateHandler;
         this.deleteHandler = deleteHandler;
@@ -70,6 +75,25 @@ public class PetController {
                         .toUri();
 
         return ResponseEntity.created(location).body(createdPet);
+    }
+
+    @GetMapping
+    @Operation(
+            summary = "Get all pets",
+            description = "Returns a list of all pets in the system")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Successfully retrieved list of pets",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = PetDTO.class)))
+            })
+    public ResponseEntity<List<PetDTO>> getAllPets() {
+        List<PetDTO> pets = getAllPetsHandler.handle();
+        return ResponseEntity.ok(pets);
     }
 
     @GetMapping("/{id}")

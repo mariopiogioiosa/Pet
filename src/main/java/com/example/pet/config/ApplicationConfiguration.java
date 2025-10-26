@@ -2,6 +2,7 @@ package com.example.pet.config;
 
 import com.example.pet.pet.application.CreatePetHandler;
 import com.example.pet.pet.application.DeletePetHandler;
+import com.example.pet.pet.application.GetAllPetsHandler;
 import com.example.pet.pet.application.GetPetByIdHandler;
 import com.example.pet.pet.application.UpdatePetHandler;
 import com.example.pet.pet.domain.PetRepository;
@@ -20,6 +21,11 @@ public class ApplicationConfiguration {
     @Bean
     public GetPetByIdHandler getPetByIdHandler(PetRepository petRepository) {
         return new GetPetByIdHandler(petRepository);
+    }
+
+    @Bean
+    public GetAllPetsHandler getAllPetsHandler(PetRepository petRepository) {
+        return new GetAllPetsHandler(petRepository);
     }
 
     @Bean

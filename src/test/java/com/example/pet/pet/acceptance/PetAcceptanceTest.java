@@ -13,11 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @WebMvcTest(controllers = com.example.pet.pet.infrastructure.api.PetController.class)
 @Import(ApplicationConfiguration.class)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class PetAcceptanceTest {
 
     @Autowired private MockMvc mockMvc;
@@ -182,5 +185,85 @@ class PetAcceptanceTest {
     @Test
     void shouldReturnNotFoundWhenDeletingNonExistentPet() throws Exception {
         mockMvc.perform(delete("/api/v1/pets/999")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoPetsExist() throws Exception {
+        mockMvc.perform(get("/api/v1/pets").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void shouldReturnAllPetsWhenMultiplePetsExist() throws Exception {
+        // Create first pet
+        String createRequest1 =
+                """
+                {
+                    "name": "Buddy",
+                    "species": "Dog",
+                    "age": 3,
+                    "ownerName": "John Doe"
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/api/v1/pets")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(createRequest1))
+                .andExpect(status().isCreated());
+
+        // Create second pet
+        String createRequest2 =
+                """
+                {
+                    "name": "Whiskers",
+                    "species": "Cat",
+                    "age": 2,
+                    "ownerName": "Jane Smith"
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/api/v1/pets")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(createRequest2))
+                .andExpect(status().isCreated());
+
+        // Create third pet without optional fields
+        String createRequest3 =
+                """
+                {
+                    "name": "Goldie",
+                    "species": "Fish"
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/api/v1/pets")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(createRequest3))
+                .andExpect(status().isCreated());
+
+        // Get all pets and verify
+        mockMvc.perform(get("/api/v1/pets").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[0].name").value("Buddy"))
+                .andExpect(jsonPath("$[0].species").value("Dog"))
+                .andExpect(jsonPath("$[0].age").value(3))
+                .andExpect(jsonPath("$[0].ownerName").value("John Doe"))
+                .andExpect(jsonPath("$[1].name").value("Whiskers"))
+                .andExpect(jsonPath("$[1].species").value("Cat"))
+                .andExpect(jsonPath("$[1].age").value(2))
+                .andExpect(jsonPath("$[1].ownerName").value("Jane Smith"))
+                .andExpect(jsonPath("$[2].name").value("Goldie"))
+                .andExpect(jsonPath("$[2].species").value("Fish"))
+                .andExpect(jsonPath("$[2].age").isEmpty())
+                .andExpect(jsonPath("$[2].ownerName").isEmpty());
     }
 }
