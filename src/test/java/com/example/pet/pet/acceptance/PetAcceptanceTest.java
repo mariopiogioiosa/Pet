@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.example.pet.config.ApplicationConfiguration;
+import com.example.pet.infrastructure.web.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @WebMvcTest(controllers = com.example.pet.pet.infrastructure.api.PetController.class)
-@Import(ApplicationConfiguration.class)
+@Import({ApplicationConfiguration.class, GlobalExceptionHandler.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class PetAcceptanceTest {
 
@@ -198,13 +199,13 @@ class PetAcceptanceTest {
 
     @Test
     void shouldReturnProblemDetailsWhenValidationFails() throws Exception {
-        // Attempt to create a pet with blank name (violates @NotBlank validation)
+        // Attempt to create a pet with multiple validation violations
         String invalidRequest =
                 """
                 {
                     "name": "",
-                    "species": "Dog",
-                    "age": 3,
+                    "species": "",
+                    "age": -5,
                     "ownerName": "John Doe"
                 }
                 """;
@@ -219,7 +220,20 @@ class PetAcceptanceTest {
                 .andExpect(jsonPath("$.title").value("Bad Request"))
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.detail").exists())
-                .andExpect(jsonPath("$.instance").exists());
+                .andExpect(jsonPath("$.instance").value("/api/v1/pets"))
+                // Verify detailed validation errors are included
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors.length()").value(3))
+                // Check that validation messages contain expected text
+                .andExpect(
+                        jsonPath("$.errors[?(@.field == 'name')].message")
+                                .value("Pet name is required"))
+                .andExpect(
+                        jsonPath("$.errors[?(@.field == 'species')].message")
+                                .value("Species is required"))
+                .andExpect(
+                        jsonPath("$.errors[?(@.field == 'age')].message")
+                                .value("Age must be non-negative"));
     }
 
     @Test
