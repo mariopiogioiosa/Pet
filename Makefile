@@ -21,7 +21,7 @@ help: ## Show this help
 	@echo "  make fmt         - Apply code formatting (Spotless)"
 	@echo "  make fmt-check   - Check formatting only"
 	@echo "  make lint        - Run Checkstyle (if configured)"
-	@echo "  make ci          - Formatting check + lint + tests (local CI)"
+	@echo "  make ci          - Formatting check + tests (local CI)"
 	@echo "  make clean-all   - Clean target and some wrapper caches"
 
 .PHONY: setup
@@ -61,14 +61,10 @@ fmt: ## Auto-format code with Spotless (if configured)
 fmt-check: ## Check formatting only
 	$(MVN) -q spotless:check
 
-#.PHONY: lint
-#lint: ## Run Checkstyle (if configured)
-#	$(MVN) -q checkstyle:check
 
 .PHONY: ci
 ci: ## Run formatting check, lint, and tests (simulate CI locally)
 	$(MVN) -q spotless:check
-	#$(MVN) -q checkstyle:check
 	$(MVN) -q test
 
 .PHONY: clean-all
