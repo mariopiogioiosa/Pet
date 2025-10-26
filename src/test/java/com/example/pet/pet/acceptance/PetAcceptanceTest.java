@@ -197,6 +197,32 @@ class PetAcceptanceTest {
     }
 
     @Test
+    void shouldReturnProblemDetailsWhenValidationFails() throws Exception {
+        // Attempt to create a pet with blank name (violates @NotBlank validation)
+        String invalidRequest =
+                """
+                {
+                    "name": "",
+                    "species": "Dog",
+                    "age": 3,
+                    "ownerName": "John Doe"
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/api/v1/pets")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(invalidRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(jsonPath("$.type").exists())
+                .andExpect(jsonPath("$.title").value("Bad Request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").exists())
+                .andExpect(jsonPath("$.instance").exists());
+    }
+
+    @Test
     void shouldReturnAllPetsWhenMultiplePetsExist() throws Exception {
         // Create first pet
         String createRequest1 =
