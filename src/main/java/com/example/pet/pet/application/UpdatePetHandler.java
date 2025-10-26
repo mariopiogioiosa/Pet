@@ -17,25 +17,22 @@ public class UpdatePetHandler {
     }
 
     public Optional<PetDTO> handle(Long id, UpdatePetRequest request) {
-        Optional<Pet> existingPetOpt = repository.findById(id);
+        return repository.findById(id)
+                .map(pet -> updatePet(id, request, pet))
+                .map(PetDTO::fromPet);
 
-        if (existingPetOpt.isEmpty()) {
-            return Optional.empty();
-        }
+    }
 
-        Pet existingPet = existingPetOpt.get();
-
-        Pet updatedPet = new Pet(
-                id,
+    private Pet updatePet(Long id, UpdatePetRequest request, Pet pet) {
+        Pet updatedPet = new Pet(id,
                 new PetName(request.name()),
                 new Species(request.species()),
                 Age.fromNullable(request.age()),
                 PersonName.fromNullable(request.ownerName()),
-                existingPet.getVersion()
+                pet.getVersion()
         );
 
-        Pet savedPet = repository.save(updatedPet);
-
-        return Optional.of(PetDTO.fromPet(savedPet));
+        repository.save(updatedPet);
+        return updatedPet;
     }
 }
