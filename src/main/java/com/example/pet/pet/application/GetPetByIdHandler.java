@@ -15,16 +15,6 @@ public class GetPetByIdHandler {
 
     public Optional<PetDTO> handle(Long id) {
         return repository.findById(id)
-                .map(this::toDTO);
-    }
-
-    private PetDTO toDTO(Pet pet) {
-        return new PetDTO(
-                pet.getId(),
-                pet.getName().value(),
-                pet.getSpecies().value(),
-                pet.getAge() != null ? pet.getAge().value() : null,
-                pet.getOwnerName() != null ? pet.getOwnerName().value() : null
-        );
+                .map(PetDTO::fromPet);
     }
 }

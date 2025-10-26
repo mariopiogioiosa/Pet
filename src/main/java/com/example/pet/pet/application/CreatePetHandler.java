@@ -24,16 +24,6 @@ public class CreatePetHandler {
 
         Pet savedPet = repository.save(pet);
 
-        return toDTO(savedPet);
-    }
-
-    private PetDTO toDTO(Pet pet) {
-        return new PetDTO(
-                pet.getId(),
-                pet.getName().value(),
-                pet.getSpecies().value(),
-                pet.getAge() != null ? pet.getAge().value() : null,
-                pet.getOwnerName() != null ? pet.getOwnerName().value() : null
-        );
+        return PetDTO.fromPet(savedPet);
     }
 }

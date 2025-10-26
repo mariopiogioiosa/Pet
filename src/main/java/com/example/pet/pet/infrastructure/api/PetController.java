@@ -4,6 +4,8 @@ import com.example.pet.pet.application.CreatePetHandler;
 import com.example.pet.pet.application.CreatePetRequest;
 import com.example.pet.pet.application.GetPetByIdHandler;
 import com.example.pet.pet.application.PetDTO;
+import com.example.pet.pet.application.UpdatePetHandler;
+import com.example.pet.pet.application.UpdatePetRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,10 +27,12 @@ public class PetController {
 
     private final GetPetByIdHandler queryHandler;
     private final CreatePetHandler createHandler;
+    private final UpdatePetHandler updateHandler;
 
-    public PetController(GetPetByIdHandler queryHandler, CreatePetHandler createHandler) {
+    public PetController(GetPetByIdHandler queryHandler, CreatePetHandler createHandler, UpdatePetHandler updateHandler) {
         this.queryHandler = queryHandler;
         this.createHandler = createHandler;
+        this.updateHandler = updateHandler;
     }
 
     @PostMapping
@@ -63,6 +67,24 @@ public class PetController {
     public ResponseEntity<PetDTO> getPetById(@Parameter(name = "id", description = "Pet ID", required = true, example = "123")
                                                  @PathVariable Long id) {
         return queryHandler.handle(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update an existing pet", description = "Updates a pet with new information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pet updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PetDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Pet not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content)
+    })
+    public ResponseEntity<PetDTO> updatePet(@Parameter(name = "id", description = "Pet ID", required = true, example = "123")
+                                                @PathVariable Long id,
+                                            @Valid @RequestBody UpdatePetRequest request) {
+        return updateHandler.handle(id, request)
                 .map(ResponseEntity::ok)
                 .orElseGet(ResponseEntity.notFound()::build);
     }
