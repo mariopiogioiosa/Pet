@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,9 +36,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request) {
+            @Nullable HttpHeaders headers,
+            @Nullable HttpStatusCode status,
+            @Nullable WebRequest request) {
 
         ProblemDetail problemDetail =
                 ProblemDetail.forStatusAndDetail(
@@ -66,9 +67,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHandlerMethodValidationException(
             HandlerMethodValidationException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request) {
+            @Nullable HttpHeaders headers,
+            @Nullable HttpStatusCode status,
+            @Nullable WebRequest request) {
 
         ProblemDetail problemDetail =
                 ProblemDetail.forStatusAndDetail(
