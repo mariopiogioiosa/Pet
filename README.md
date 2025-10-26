@@ -1,5 +1,7 @@
 # Pet Management REST API
 
+![CI](https://github.com/mariopiogioiosa/pet/actions/workflows/ci.yml/badge.svg)
+
 A Spring Boot REST application for managing pet information. 
 Built with Java 25 and Spring Boot 3.5.7, using an in-memory repository.
 
