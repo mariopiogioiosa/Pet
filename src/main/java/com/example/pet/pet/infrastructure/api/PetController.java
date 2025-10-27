@@ -1,5 +1,6 @@
 package com.example.pet.pet.infrastructure.api;
 
+import com.example.pet.infrastructure.web.ValidationErrorResponse;
 import com.example.pet.pet.application.CreatePetHandler;
 import com.example.pet.pet.application.CreatePetRequest;
 import com.example.pet.pet.application.DeletePetHandler;
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -66,7 +66,10 @@ public class PetController {
                         content =
                                 @Content(
                                         mediaType = "application/problem+json",
-                                        schema = @Schema(implementation = ProblemDetail.class)))
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                ValidationErrorResponse.class)))
             })
     public ResponseEntity<PetDTO> createPet(@Valid @RequestBody CreatePetRequest request) {
         PetDTO createdPet = createHandler.handle(request);
@@ -147,7 +150,10 @@ public class PetController {
                         content =
                                 @Content(
                                         mediaType = "application/problem+json",
-                                        schema = @Schema(implementation = ProblemDetail.class)))
+                                        schema =
+                                                @Schema(
+                                                        implementation =
+                                                                ValidationErrorResponse.class)))
             })
     public ResponseEntity<PetDTO> updatePet(
             @Parameter(name = "id", description = "Pet ID", required = true, example = "123")
