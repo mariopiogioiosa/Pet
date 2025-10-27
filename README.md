@@ -61,7 +61,7 @@ This application follows **Hexagonal Architecture**, organizing code into three 
 
 This separation supports the planned migration from relational to non-relational databases by keeping persistence concerns isolated through the Repository pattern.
 
-## Implementing a New Database
+## Adding Support for a New Database
 
 The application is designed to support database migration through the **Repository Pattern** and **Contract Testing**.
 
