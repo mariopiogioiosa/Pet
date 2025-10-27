@@ -236,6 +236,67 @@ class PetAcceptanceTest {
     }
 
     @Test
+    void shouldReturnProblemDetailsWhenUpdateValidationFails() throws Exception {
+        // Create a valid pet first
+        String createRequest =
+                """
+                {
+                    "name": "Buddy",
+                    "species": "Dog",
+                    "age": 3,
+                    "ownerName": "John Doe"
+                }
+                """;
+
+        MvcResult createResult =
+                mockMvc.perform(
+                                post("/api/v1/pets")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(createRequest))
+                        .andExpect(status().isCreated())
+                        .andReturn();
+
+        String responseBody = createResult.getResponse().getContentAsString();
+        long createdPetId = objectMapper.readTree(responseBody).get("id").asLong();
+
+        // Attempt to update with invalid data
+        String invalidUpdateRequest =
+                """
+                {
+                    "name": "",
+                    "species": "",
+                    "age": -10,
+                    "ownerName": "Jane Doe"
+                }
+                """;
+
+        mockMvc.perform(
+                        put("/api/v1/pets/" + createdPetId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(invalidUpdateRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(jsonPath("$.type").exists())
+                .andExpect(jsonPath("$.title").value("Bad Request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").exists())
+                .andExpect(jsonPath("$.instance").value("/api/v1/pets/" + createdPetId))
+                // Verify detailed validation errors are included
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors.length()").value(3))
+                // Check that validation messages contain expected text
+                .andExpect(
+                        jsonPath("$.errors[?(@.field == 'name')].message")
+                                .value("Pet name is required"))
+                .andExpect(
+                        jsonPath("$.errors[?(@.field == 'species')].message")
+                                .value("Species is required"))
+                .andExpect(
+                        jsonPath("$.errors[?(@.field == 'age')].message")
+                                .value("Age must be non-negative"));
+    }
+
+    @Test
     void shouldReturnAllPetsWhenMultiplePetsExist() throws Exception {
         // Create first pet
         String createRequest1 =
