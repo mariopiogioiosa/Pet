@@ -132,9 +132,6 @@ public PetRepository petRepository(DataSource dataSource) {
 ```
 ## Key Design Decisions
 
-### Value Objects
-Domain entities use value objects (`PetName`, `Species`, `Age`, `PersonName`) to encapsulate validation logic and make business rules explicit. Invalid values are rejected at construction time.
-
 ### Optimistic Locking
 The `Pet` entity includes a `version` field that increments on each update. Concurrent modifications are detected and rejected with `OptimisticLockException`, preventing lost updates.
 
@@ -156,17 +153,3 @@ API errors return structured Problem Details responses with detailed validation 
 ```
 
 See `GlobalExceptionHandler.java` for implementation details.
-
-## Testing Strategy
-
-The project includes multiple testing levels:
-
-- **Unit Tests**: Value objects and domain logic (`PetNameTest`, `SpeciesTest`, etc.)
-- **Contract Tests**: Repository behavior specification (`PetRepositoryContractTest`)
-- **Implementation Tests**: Verify specific repository implementations (`InMemoryPetRepositoryTest`)
-- **Acceptance Tests**: Full API workflows with Spring MockMvc (`PetAcceptanceTest`)
-
-Run all tests with:
-```bash
-make test
-```
